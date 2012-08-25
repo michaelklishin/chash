@@ -44,7 +44,7 @@
 
 (defn ^bytes key-of
   [value]
-  (.asBytes (h/sha1-of value)))
+  (.asLong (h/sha1-of value)))
 
 (defn claims
   [^CHash chash]
@@ -53,6 +53,10 @@
 (defn claimants
   [^CHash chash]
   (pl/vals (.claims chash)))
+
+(defn partitions
+  [^CHash chash]
+  (pl/keys (.claims chash)))
 
 (defn claimant?
   [^CHash chash node]
@@ -64,32 +68,41 @@
 
 (defn merge
   [^CHash one ^CHash another]
-  )
+  (comment TODO))
 
 (defn next-index
   [^CHash chash idx]
-  )
-
-(defn ordered-from
-  [^CHash chash idx]
-  )
+  (let [n (.n-partitions chash)
+        i (ring-increment n)]
+    (* i (rem (inc (quot idx i)) n))))
 
 (defn predecessors
-  [^CHash chash idx]
-  )
+  ([^CHash chash idx]
+     (predecessors chash idx (.n-partitions chash)))
+  ([^CHash chash idx n]
+     (let [n' (max-n chash n)
+           i  (ring-increment (.n-partitions chash))
+           ;; split index
+           si (inc (quot n i))
+           [before after] (split-at si (.claims chash))
+           ;; wrap around
+           ordered        (reverse (concat after before))]
+       (take n' ordered))))
 
 (defn successors
-  [^CHash chash idx n]
-  (let [n' (max-n chash n)
-        i  (ring-increment (.n-partitions chash))
-        ;; split index
-        si (inc (quot n i))
-        [before after] (split-at si (.claims chash))
-        ;; wrap around
-        ordered        (concat after before)]
-    (if (= (.n-partitions chash) n')
-      ordered
-      (take n' ordered))))
+  ([^CHash chash idx]
+     (successors chash idx (.n-partitions chash)))
+  ([^CHash chash idx n]
+     (let [n' (max-n chash n)
+           i  (ring-increment (.n-partitions chash))
+           ;; split index
+           si (inc (quot n i))
+           [before after] (split-at si (.claims chash))
+           ;; wrap around
+           ordered        (concat after before)]
+       (if (= (.n-partitions chash) n')
+         ordered
+         (take n' ordered)))))
 
 (defn update
   [^CHash chash idx node]

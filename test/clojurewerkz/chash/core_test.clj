@@ -95,3 +95,48 @@
               [5.480631139990886E47 "node1@giove.local"]
               [7.3075081866545146E47 "node1@giove.local"]]
              xs)))))
+
+
+(deftest test-predecessors
+  (testing "initial partition"
+    (let [node "node1@giove.local"
+          key  (ch/key-of 0)
+          n    8
+          r    (ch/fresh n node)
+          xs   (ch/predecessors r key 3)]
+      (is (=  3 (count xs)))
+      (is (= [[0 "node1@giove.local"]
+              [1.27881393266454E48 "node1@giove.local"]
+              [1.0961262279981772E48 "node1@giove.local"]]
+             xs))))
+  (testing "random partition"
+    (let [node "node1@giove.local"
+          key  (ch/key-of 888392888)
+          n    8
+          r    (ch/fresh n node)
+          xs   (ch/predecessors r key 4)]
+      (is (=  4 (count xs)))
+      (is (= [[0 "node1@giove.local"]
+              [1.27881393266454E48 "node1@giove.local"]
+              [1.0961262279981772E48 "node1@giove.local"]
+              [9.134385233318143E47 "node1@giove.local"]]
+             xs)))))
+
+
+(deftest test-inverse-predecessors
+  (let [node "node1@giove.local"
+        key  (ch/key-of 4)
+        n    8
+        r    (ch/fresh n node)
+        xs   (ch/successors r key)
+        ys   (ch/predecessors r key)]
+    (is (= n (count xs) (count ys)))
+    (is (= xs (reverse ys)))))
+
+
+(deftest test-next-index
+  (let [n    8
+        seed "node1@giove.local"
+        r    (ch/fresh n seed)]
+    (is (ch/partitions r) 1.8268770466636286E47)
+    (is (= 1.8268770466636286E47 (ch/next-index r (ch/key-of 1))))))
