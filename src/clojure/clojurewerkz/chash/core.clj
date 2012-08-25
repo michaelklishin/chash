@@ -52,7 +52,7 @@
 
 (defn claimants
   [^CHash chash]
-  (pl/values (.claims chash)))
+  (pl/vals (.claims chash)))
 
 (defn claimant?
   [^CHash chash node]

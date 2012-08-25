@@ -8,7 +8,7 @@
 (defn create
   "Creates a new property list (a vector of pairs)"
   [& xs]
-  (if (even? (count xs))
+  (if (even? (clojure.core/count xs))
     (vec (doall (partition 2 xs)))
     (throw (IllegalArgumentException. "proplists must be initialized "))))
 
