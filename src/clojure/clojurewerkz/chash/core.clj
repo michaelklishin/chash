@@ -1,7 +1,8 @@
 (ns clojurewerkz.chash.core
-  (:refer-clojure :except [get merge count])
+  (:refer-clojure :exclude [get merge count contains?])
   (:require [clojurewerkz.support.hashing :as h]
-            [clojurewerkz.support.core :as c]))
+            [clojurewerkz.support.core :as c]
+            [clojurewerkz.chash.proplists :as pl]))
 
 ;;
 ;; Implementation
@@ -14,14 +15,16 @@
   [^long n]
   (quot ring-top n))
 
+(defrecord CHash [^long n-partitions ^clojure.lang.IPersistentList claims])
 
+(defn max-n
+  [^CHash chash ^long l]
+  (min (.n-partitions chash) l))
 
 
 ;;
 ;; API
 ;;
-
-(defrecord CHash [^long n-partitions ^clojure.lang.IPersistentMap claims])
 
 (defn contains?
   [chash node]
@@ -31,12 +34,12 @@
   [^long n seed]
   (let [delta (ring-increment n)
         xs    (doall (range 0 ring-top delta))]
-    (CHash. n (reduce (fn [m p]
-                        (assoc m p seed))
-                      (sorted-map) xs))))
+    (CHash. n (reduce (fn [plist p]
+                        (conj plist [p seed]))
+                      [] xs))))
 
 (defn get
-  [^CHash chash ^long idx]
+  [^CHash chash idx]
   )
 
 (defn ^bytes key-of
@@ -47,34 +50,47 @@
   [^CHash chash]
   (.claims chash))
 
-(defn nodes
+(defn claimants
   [^CHash chash]
-  (-> (.claims chash) vals sort set))
+  (pl/values (.claims chash)))
 
-(defn ^long count
+(defn claimant?
+  [^CHash chash node]
+  (some #{node} (claimants chash)))
+
+(defn count
   [^CHash chash]
-  (clojure.core/count (.claims chash)))
+  (.n-partitions chash))
 
 (defn merge
   [^CHash one ^CHash another]
   )
 
 (defn next-index
-  [^CHash chash ^String k]
+  [^CHash chash idx]
   )
 
 (defn ordered-from
-  [^CHash chash ^long idx]
+  [^CHash chash idx]
   )
 
 (defn predecessors
-  [^CHash chash ^long idx]
+  [^CHash chash idx]
   )
 
 (defn successors
-  [^CHash chash ^long idx ^long n]
-  )
+  [^CHash chash idx n]
+  (let [n' (max-n chash n)
+        i  (ring-increment (.n-partitions chash))
+        ;; split index
+        si (inc (quot n i))
+        [before after] (split-at si (.claims chash))
+        ;; wrap around
+        ordered        (concat after before)]
+    (if (= (.n-partitions chash) n')
+      ordered
+      (take n' ordered))))
 
 (defn update
-  []
-  )
+  [^CHash chash idx node]
+  (CHash. (.n-partitions chash) (pl/assoc (.claims chash) idx node)))
