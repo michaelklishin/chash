@@ -12,7 +12,7 @@ CHash is a young project but based on the consistent hashing implementation from
 
 ## Artifacts
 
-... artifacts are [released to Clojars](https://clojars.org/clojurewerkz/chash). If you are using Maven, add the following repository
+CHash artifacts are [released to Clojars](https://clojars.org/clojurewerkz/chash). If you are using Maven, add the following repository
 definition to your `pom.xml`:
 
 ``` xml
