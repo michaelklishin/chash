@@ -31,6 +31,7 @@
   (pl/contains? (.claims chash) node))
 
 (defn ^Ring fresh
+  "Takes the size and seed node of a new ring, constructs and returns it"
   [^long n seed]
   (let [delta (ring-increment n)
         xs    (doall (range 0 ring-top delta))]
@@ -39,10 +40,13 @@
                       [] xs))))
 
 (defn get
+  "Returns the node that owns the partition identified by the provided index"
   [^Ring chash idx]
   (pl/get (.claims chash) idx))
 
-(defn ^bytes key-of
+(defn ^long key-of
+  "Returns value's key into the ring. Two values with the same SHA-1 hash value are
+   considered the same name"
   [value]
   (.asLong (h/sha1-of value)))
 
@@ -51,18 +55,22 @@
   (.claims chash))
 
 (defn claimants
+  "Returns all nodes that claim partitions on the ring"
   [^Ring chash]
   (pl/vals (.claims chash)))
 
 (defn partitions
+  "Returns all partitions in the ring"
   [^Ring chash]
   (pl/keys (.claims chash)))
 
 (defn claimant?
+  "Returns true if the given node claims a partition in the ring"
   [^Ring chash node]
   (some #{node} (claimants chash)))
 
 (defn count
+  "Returns sizes of the ring"
   [^Ring chash]
   (.n-partitions chash))
 
@@ -71,6 +79,8 @@
   (rand-nth xs))
 
 (defn merge
+  "Randomized merging of two rings. When two nodes claim the same partition,
+   the owner in the resulting ring is selected randomly"
   [^Ring one ^Ring another]
   (if (= (count one) (count another))
     (let [pairs  (partition 2 (interleave (.claims one) (.claims another)))
@@ -80,12 +90,15 @@
     (throw (IllegalArgumentException. "cannot merge two rings with different numbers of partitions"))))
 
 (defn next-index
+  "Returns the partition that follows the given key"
   [^Ring chash idx]
   (let [n (.n-partitions chash)
         i (ring-increment n)]
     (* i (rem (inc (quot idx i)) n))))
 
 (defn predecessors
+  "Returns all or up to n nodes in the ring before the given index as
+   a property list (sequence of pairs)"  
   ([^Ring chash idx]
      (predecessors chash idx (.n-partitions chash)))
   ([^Ring chash idx n]
@@ -99,6 +112,8 @@
        (take n' ordered))))
 
 (defn successors
+  "Returns all or up to n nodes in the ring starting with the given index as
+   a property list (sequence of pairs)"
   ([^Ring chash idx]
      (successors chash idx (.n-partitions chash)))
   ([^Ring chash idx n]
@@ -114,5 +129,6 @@
          (take n' ordered)))))
 
 (defn update
+  "Updates claimant of the given partition"
   [^Ring chash idx node]
   (Ring. (.n-partitions chash) (pl/assoc (.claims chash) idx node)))
