@@ -42,9 +42,13 @@
   [plist]
   (set (sort (doall (map second plist)))))
 
+(defn index-of
+  [plist k]
+  (count (take-while (fn [[k' v]]
+                       (not (= k' k))) plist)))
+
 (defn assoc
   [plist k v]
-  (let [[before _ after] (partition-by (fn [[k' v]]
-                                         (= k' k))
-                                       plist)]
-    (concat before [[k v]] after)))
+  (let [i              (index-of plist k)
+        [before after] (split-at i plist)]
+    (concat before [[k v]] (rest after))))

@@ -1,4 +1,4 @@
-(ns clojurewerkz.chash.core
+(ns clojurewerkz.chash.ring
   (:refer-clojure :exclude [get merge count contains?])
   (:require [clojurewerkz.support.hashing :as h]
             [clojurewerkz.support.core :as c]
@@ -15,10 +15,10 @@
   [^long n]
   (quot ring-top n))
 
-(defrecord CHash [^long n-partitions ^clojure.lang.IPersistentList claims])
+(defrecord Ring [^long n-partitions ^clojure.lang.IPersistentList claims])
 
 (defn max-n
-  [^CHash chash ^long l]
+  [^Ring chash ^long l]
   (min (.n-partitions chash) l))
 
 
@@ -27,59 +27,68 @@
 ;;
 
 (defn contains?
-  [chash node]
-  )
+  [^Ring chash node]
+  (pl/contains? (.claims chash) node))
 
-(defn ^CHash fresh
+(defn ^Ring fresh
   [^long n seed]
   (let [delta (ring-increment n)
         xs    (doall (range 0 ring-top delta))]
-    (CHash. n (reduce (fn [plist p]
+    (Ring. n (reduce (fn [plist p]
                         (conj plist [p seed]))
                       [] xs))))
 
 (defn get
-  [^CHash chash idx]
-  )
+  [^Ring chash idx]
+  (pl/get (.claims chash) idx))
 
 (defn ^bytes key-of
   [value]
   (.asLong (h/sha1-of value)))
 
 (defn claims
-  [^CHash chash]
+  [^Ring chash]
   (.claims chash))
 
 (defn claimants
-  [^CHash chash]
+  [^Ring chash]
   (pl/vals (.claims chash)))
 
 (defn partitions
-  [^CHash chash]
+  [^Ring chash]
   (pl/keys (.claims chash)))
 
 (defn claimant?
-  [^CHash chash node]
+  [^Ring chash node]
   (some #{node} (claimants chash)))
 
 (defn count
-  [^CHash chash]
+  [^Ring chash]
   (.n-partitions chash))
 
+(defn- random-of
+  [& xs]
+  (rand-nth xs))
+
 (defn merge
-  [^CHash one ^CHash another]
-  (comment TODO))
+  [^Ring one ^Ring another]
+  (if (= (count one) (count another))
+    (let [pairs  (partition 2 (interleave (.claims one) (.claims another)))
+          merged (for [[a b] pairs]
+                   (random-of a b))]
+      (Ring. (count one) merged))
+    (throw (IllegalArgumentException. "cannot merge two rings with different numbers of partitions"))))
 
 (defn next-index
-  [^CHash chash idx]
+  [^Ring chash idx]
   (let [n (.n-partitions chash)
         i (ring-increment n)]
     (* i (rem (inc (quot idx i)) n))))
 
 (defn predecessors
-  ([^CHash chash idx]
+  ([^Ring chash idx]
      (predecessors chash idx (.n-partitions chash)))
-  ([^CHash chash idx n]
+  ([^Ring chash idx n]
      (let [n' (max-n chash n)
            i  (ring-increment (.n-partitions chash))
            ;; split index
@@ -90,9 +99,9 @@
        (take n' ordered))))
 
 (defn successors
-  ([^CHash chash idx]
+  ([^Ring chash idx]
      (successors chash idx (.n-partitions chash)))
-  ([^CHash chash idx n]
+  ([^Ring chash idx n]
      (let [n' (max-n chash n)
            i  (ring-increment (.n-partitions chash))
            ;; split index
@@ -105,5 +114,5 @@
          (take n' ordered)))))
 
 (defn update
-  [^CHash chash idx node]
-  (CHash. (.n-partitions chash) (pl/assoc (.claims chash) idx node)))
+  [^Ring chash idx node]
+  (Ring. (.n-partitions chash) (pl/assoc (.claims chash) idx node)))

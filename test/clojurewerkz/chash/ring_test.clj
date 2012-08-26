@@ -1,5 +1,5 @@
-(ns clojurewerkz.chash.core-test
-  (:require [clojurewerkz.chash.core :as ch])
+(ns clojurewerkz.chash.ring-test
+  (:require [clojurewerkz.chash.ring :as ch])
   (:use clojure.test))
 
 
@@ -138,5 +138,26 @@
   (let [n    8
         seed "node1@giove.local"
         r    (ch/fresh n seed)]
-    (is (ch/partitions r) 1.8268770466636286E47)
+    (is (ch/partitions r) #{1.8268770466636286E47})
     (is (= 1.8268770466636286E47 (ch/next-index r (ch/key-of 1))))))
+
+
+(deftest test-get
+  (let [n    8
+        seed "node@giove.local"
+        alt  "node2@giove.local"
+        idx  1.8268770466636286E47
+        r    (ch/fresh n seed)
+        r'   (ch/update r idx alt)]
+    (is (= seed (ch/get r idx)))
+    (is (= alt (ch/get r' idx)))))
+
+
+(deftest test-merge
+  (let [n     8
+        node1 "node1@giove.local"
+        node2 "node2@giove.local"
+        r1    (ch/fresh n node1)
+        r2    (ch/update (ch/fresh n node2) 0 node1)
+        r3    (ch/merge r1 r2)]
+    (is (= node1 (ch/get r3 0)))))
