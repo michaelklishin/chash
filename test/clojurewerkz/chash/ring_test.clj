@@ -1,6 +1,6 @@
 (ns clojurewerkz.chash.ring-test
-  (:require [clojurewerkz.chash.ring :as ch])
-  (:use clojure.test))
+  (:require [clojurewerkz.chash.ring :as ch]
+            [clojure.test :refer :all]))
 
 
 (def eight-partitions [[0 "node1@giove.local"]
