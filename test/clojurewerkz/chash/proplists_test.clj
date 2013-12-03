@@ -1,6 +1,6 @@
 (ns clojurewerkz.chash.proplists-test
-  (:require [clojurewerkz.chash.proplists :as pl])
-  (:use clojure.test))
+  (:require [clojurewerkz.chash.proplists :as pl]
+            [clojure.test :refer :all]))
 
 
 (deftest test-count
