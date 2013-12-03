@@ -76,9 +76,9 @@ See documentation strings for `clojurewerkz.chash.core` functions and [our test 
 
 
 
-## Supported Clojure versions
+## Supported Clojure Versions
 
-CHash is built from the ground up for Clojure 1.3.0 and up.
+CHash requires Clojure 1.4 or later.
 
 
 ## Continuous Integration Status
