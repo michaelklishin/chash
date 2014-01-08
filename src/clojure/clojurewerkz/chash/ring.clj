@@ -8,11 +8,11 @@
 ;; Implementation
 ;;
 
-(def ^{:const true :tag long}
+(def ^{:const true :tag 'long}
   ring-top (dec (Math/pow 2 160)))
 
-(defn ^long ring-increment
-  [^long n]
+(defn ring-increment
+  ^double [^long n]
   (quot ring-top n))
 
 (defrecord Ring [^long n-partitions ^clojure.lang.IPersistentList claims])
@@ -44,10 +44,10 @@
   [^Ring chash idx]
   (pl/get (.claims chash) idx))
 
-(defn ^long key-of
+(defn key-of
   "Returns value's key into the ring. Two values with the same SHA-1 hash value are
    considered the same name"
-  [value]
+  ^long [value]
   (.asLong (h/sha1-of value)))
 
 (defn claims

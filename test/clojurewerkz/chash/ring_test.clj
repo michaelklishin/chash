@@ -138,7 +138,7 @@
   (let [n    8
         seed "node1@giove.local"
         r    (ch/fresh n seed)]
-    (is (ch/partitions r) #{1.8268770466636286E47})
+    (is (= (second (ch/partitions r)) 1.8268770466636286E47))
     (is (= 1.8268770466636286E47 (ch/next-index r (ch/key-of 1))))))
 
 
