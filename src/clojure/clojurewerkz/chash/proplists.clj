@@ -7,12 +7,10 @@
 ;; the terms of this license.
 ;; You must not remove this notice, or any other, from this software.
 
-(ns ^{:doc "A very minimalistic and intentionally incomplete implementation of
-            Erlang proplists (ordered pairs that support random access)"}
-  clojurewerkz.chash.proplists
+(ns clojurewerkz.chash.proplists
+  "A very minimalistic and intentionally incomplete implementation of
+   Erlang proplists (ordered pairs that support random access)"
   (:refer-clojure :exclude [count nth get contains? keys vals assoc]))
-
-
 
 (defn create
   "Creates a new property list (a vector of pairs)"
