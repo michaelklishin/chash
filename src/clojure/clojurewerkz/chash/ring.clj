@@ -8,7 +8,7 @@
 ;; You must not remove this notice, or any other, from this software.
 
 (ns clojurewerkz.chash.ring
-  (:refer-clojure :exclude [get merge count contains?])
+  (:refer-clojure :exclude [get merge count contains? update])
   (:require [clojurewerkz.support.hashing :as h]
             [clojurewerkz.support.core :as c]
             [clojurewerkz.chash.proplists :as pl]))
