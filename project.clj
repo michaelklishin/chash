@@ -1,7 +1,7 @@
 (defproject clojurewerkz/chash "1.2.0-SNAPSHOT"
   :description "A yet another consistent hashing library for Clojure"
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [clojurewerkz/support "1.0.0"]]
+                 [clojurewerkz/support "1.1.0"]]
   :profiles {:1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0-alpha4"]]}
