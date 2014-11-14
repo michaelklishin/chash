@@ -1,4 +1,4 @@
-(defproject clojurewerkz/chash "1.2.0"
+(defproject clojurewerkz/chash "1.3.0-SNAPSHOT"
   :description "A yet another consistent hashing library for Clojure"
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [clojurewerkz/support "1.1.0"]]
