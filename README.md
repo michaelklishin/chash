@@ -6,7 +6,7 @@ CHash is a yet another consistent hashing library in Clojure, heavily inspired b
 
 ## Project Maturity
 
-CHash is a young project but based on the consistent hashing implementation from Riak Core which is mature.
+CHash is not a young project and based on the consistent hashing implementation from Riak Core which is mature.
 
 
 
